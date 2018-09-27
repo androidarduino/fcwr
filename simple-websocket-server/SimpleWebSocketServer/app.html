@@ -1,0 +1,72 @@
+<script language="javascript" type="text/javascript">
+  function doConnect()
+  {
+    websocket = new WebSocket("ws://ec2-34-201-43-105.compute-1.amazonaws.com:8000");
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    console.log("connected\n");
+  }
+
+  function onClose(evt)
+  {
+    console.log("disconnected\n");
+  }
+
+  function onMessage(evt)
+  {
+    console.log("received: " + evt.data + '\n');
+    parseMessage(evt.data);
+  }
+
+  function onError(evt)
+  {
+    console.log('error: ' + evt.data + '\n');
+	websocket.close();
+  }
+
+  function doSend(message)
+  {
+    console.log("sent: " + message + '\n'); 
+    websocket.send(message);
+  }
+
+  function doDisconnect() {
+	websocket.close();
+  }
+
+  function tellLight(cmd, param) {
+    doSend("Lights:"+param+":"+cmd);
+  }
+
+  function parseMessage(msg) {
+    var p = msg.split(":");
+    console.log(p);
+    if (p[0] != "App") return;
+    var cmd = p[2];
+    var param = p[1];
+    tellApp(cmd, param);
+  }
+
+  function tellApp(cmd, param) {
+console.log("excuting " + cmd + " " + param);
+//TODO: add your processing code here
+/* Samples:
+tellApp(“off”, “3”); //3号女嘉宾灭灯
+tellApp(“flash”, “5”); //5号女嘉宾为男嘉宾爆灯
+tellApp(“handUp”, “4”); //4号女嘉宾要求发言
+tellApp(“favorite”, “3”); //男嘉宾选了3号作为心动女生
+tellApp(“allOff”, “0”); //所有女嘉宾已经灭灯，男嘉宾悲剧了
+tellApp(“comment”, “3号女嘉宾加油，我们支持你！”); //观众发送了弹幕
+*/
+  }
+
+</script>
+
+<p>Click on connect to receive updates, also call doConnect() in page onload</p>
+<p><input type="button" onClick="doConnect();">Connect</input></p>
