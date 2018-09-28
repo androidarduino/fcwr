@@ -8,7 +8,12 @@ except ImportError:
 import time
 
 l = {}
-channel = False
+#TODO: change default to False later, this is just for testing
+channel = True
+
+# Initialize lights
+for i in range(1, 12):
+    l[str(i)] = "off"
 
 def air():
     global channel
@@ -19,6 +24,7 @@ def setAir(c):
     channel = c
 
 def updateLEDs(obj, status):
+    print "updating " + obj + " to " + status
     pass
 
 def resetLight(obj, ws, l):
@@ -28,10 +34,10 @@ def resetLight(obj, ws, l):
 def flashLight(obj, ws, l):
   # obj女嘉宾试图爆灯，检查状态，确认通道开启而且女嘉宾为亮灯状态后，发送爆灯信息给App，obj开始闪烁
   print "flash light called"
-  if (! (obj in l)):
-    l[obj] = "null"
+  if (not (obj in l)):
+    l[obj] = "on"
   status = l[obj]
-  if (status != "on" or ! channelOpen()):
+  if (status != "on" or not air()):
     return
   ws.send("App:" + obj + ":flash")
   updateLEDs(obj, "flash")
@@ -40,10 +46,10 @@ def flashLight(obj, ws, l):
 def offLight(obj, ws, l):
   # obj女嘉宾试图灭灯，检查状态，确认通道开启而且女嘉宾为亮灯状态后，发送obj灭灯信息，熄灭obj
   print "off light called"
-  if (! (obj in l)):
-    l[obj] = "null"
+  if (not (obj in l)):
+    l[obj] = "on"
   status = l[obj]
-  if (status != "on" or ! channelOpen()):
+  if (status != "on" or not air()):
     return
   ws.send("App:" + obj + ":off")
   updateLEDs(obj, "off")
@@ -53,7 +59,7 @@ def allLightsOn(obj, ws, l):
   # 所有灯为点亮状态，通道开启
   print "all lights on called"
   setAir(True)
-  for (i in l):
+  for i in l:
     l[i] = "on"
     updateLEDs(i, "on")
 
@@ -61,7 +67,7 @@ def allLightsFlash(obj, ws, l):
   # 庆祝模式，关闭通道，所有灯彩色闪烁状态
   print "all lights flash called"
   setAir(False)
-  for (i in l):
+  for i in l:
     l[i] = "flash"
     updateLEDs(i, "flash")
 
@@ -75,7 +81,7 @@ def allLightsOff(obj, ws, l):
   # 关闭通道，所有灯灭
   print "all lights off called"
   setAir(False)
-  for (i in l):
+  for i in l:
     l[i] = "off"
     updateLEDs(i, "off")
 
