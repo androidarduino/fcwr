@@ -23,8 +23,8 @@ def setAir(c):
     global channel
     channel = c
 
-def updateLEDs(obj, status):
-    print "updating " + obj + " to " + status
+def updateLEDs(obj, oldStatus, newStatus):
+    print "updating " + obj + " from " + oldStatus + " to " + newStatus
     pass
 
 def resetLight(obj, ws, l):
@@ -40,7 +40,7 @@ def flashLight(obj, ws, l):
   if (status != "on" or not air()):
     return
   ws.send("App:" + obj + ":flash")
-  updateLEDs(obj, "flash")
+  updateLEDs(obj, "on", "flash")
   l[obj] = "flash"
 
 def offLight(obj, ws, l):
@@ -52,7 +52,7 @@ def offLight(obj, ws, l):
   if (status != "on" or not air()):
     return
   ws.send("App:" + obj + ":off")
-  updateLEDs(obj, "off")
+  updateLEDs(obj, "on", "off")
   l[obj] = "off"
 
 def allLightsOn(obj, ws, l):
@@ -61,42 +61,45 @@ def allLightsOn(obj, ws, l):
   setAir(True)
   for i in l:
     l[i] = "on"
-    updateLEDs(i, "on")
+    updateLEDs(i, "off", "on")
 
 def allLightsFlash(obj, ws, l):
   # 庆祝模式，关闭通道，所有灯彩色闪烁状态
   print "all lights flash called"
   setAir(False)
   for i in l:
+    oldStatus = l[i]
     l[i] = "flash"
-    updateLEDs(i, "flash")
+    updateLEDs(i, oldStatus, "flash")
 
 def allLightsMusic(obj, ws, l):
   # 休闲模式，关闭通道，所有灯按照音乐节奏闪烁
   print "all lights music called"
   setAir(False)
-  updateLEDs("0", "music")
+  updateLEDs("0", "off", "music")
 
 def allLightsOff(obj, ws, l):
   # 关闭通道，所有灯灭
   print "all lights off called"
   setAir(False)
   for i in l:
+    oldStatus = l[i]
     l[i] = "off"
-    updateLEDs(i, "off")
+    updateLEDs(i, oldStatus, "off")
 
 def favoriteGirl(obj, ws, l):
   # 心动女生为obj，确认通道开启后，obj灯开始闪烁，其他灯状态不变，关闭通道
   print "favorite girl called"
   setAir(False)
+  oldStatus = l[obj]
   l[obj] = "favorite"
-  updateLEDs(obj, "favorite")
+  updateLEDs(obj, oldStatus, "favorite")
 
 def lightOn(obj, ws, l):
   # 无论通道是否开启，都把obj的状态改为点亮，发送亮灯信息，不影响其他灯状态
   print "light on called"
   l[obj] = "on"
-  updateLEDs(obj, "on")
+  updateLEDs(obj, "off", "on")
 
 def on_message(ws, message):
     # here update the light strings
