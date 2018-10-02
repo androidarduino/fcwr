@@ -10,6 +10,7 @@ import time
 l = {}
 #TODO: change default to False later, this is just for testing
 channel = True
+st = {"on": 1, "off":2, "flash":3, "music":4, "favorite":5}
 
 # Initialize lights
 for i in range(1, 12):
@@ -25,6 +26,7 @@ def setAir(c):
 
 def updateLEDs(obj, oldStatus, newStatus):
     print "updating " + obj + " from " + oldStatus + " to " + newStatus
+    # send st[oldStatus] + "," + st[newStatus] + "," + obj to arduino
     pass
 
 def resetLight(obj, ws, l):
