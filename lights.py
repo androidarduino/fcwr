@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import websocket
+import serial
 try:
     import thread
 except ImportError:
@@ -10,10 +11,12 @@ import time
 l = {}
 #TODO: change default to False later, this is just for testing
 channel = True
-st = {"on": 1, "off":2, "flash":3, "music":4, "favorite":5}
+st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3"}
+
+arduino = serial.Serial('/dev/cu.usbmodem1421', 9600, timeout = 1)
 
 # Initialize lights
-for i in range(1, 12):
+for i in range(1, 13):
     l[str(i)] = "off"
 
 def air():
@@ -25,8 +28,10 @@ def setAir(c):
     channel = c
 
 def updateLEDs(obj, oldStatus, newStatus):
-    print "updating " + obj + " from " + oldStatus + " to " + newStatus
     # send st[oldStatus] + "," + st[newStatus] + "," + obj to arduino
+    cmd = st[oldStatus] + "," + st[newStatus] + "," + obj + "\n"
+    print "updating " + obj + " from " + oldStatus + " to " + newStatus + ":" + cmd
+    arduino.write(cmd)
     pass
 
 def resetLight(obj, ws, l):

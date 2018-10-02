@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8" />
+<title>亚马逊非诚勿扰</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script language="javascript" type="text/javascript">
+		var brideId=10;
+function init()
+{
+		document.myform.url.value = "ws://ec2-34-201-43-105.compute-1.amazonaws.com:8000"
+		document.myform.inputtext.value = brideId + "号女嘉宾"
+		document.myform.disconnectButton.disabled = true;
+}
+
+function doConnect()
+{
+		websocket = new WebSocket(document.myform.url.value);
+		websocket.onopen = function(evt) { onOpen(evt) };
+		websocket.onclose = function(evt) { onClose(evt) };
+		websocket.onmessage = function(evt) { onMessage(evt) };
+		websocket.onerror = function(evt) { onError(evt) };
+}
+
+function onOpen(evt)
+{
+		writeToScreen("connected\n");
+		document.myform.connectButton.disabled = true;
+		document.myform.disconnectButton.disabled = false;
+}
+
+function onClose(evt)
+{
+		writeToScreen("disconnected\n");
+		document.myform.connectButton.disabled = false;
+		document.myform.disconnectButton.disabled = true;
+}
+
+function onMessage(evt)
+{
+		writeToScreen("response: " + evt.data + '\n');
+}
+
+function onError(evt)
+{
+		writeToScreen('error: ' + evt.data + '\n');
+
+		websocket.close();
+
+		document.myform.connectButton.disabled = false;
+		document.myform.disconnectButton.disabled = true;
+
+}
+
+function doSend(message)
+{
+		writeToScreen("sent: " + message + '\n'); 
+		if(websocket.readyState!=1) {
+				doConnect();
+				waitForSocketConnection(websocket, function(){websocket.send(message);});
+				return;
+		}
+		websocket.send(message);
+}
+
+function waitForSocketConnection(socket, callback){
+		setTimeout(
+				function () {
+						if (socket.readyState === 1) {
+								if(callback != null){
+										callback();
+								}
+								return;
+
+						} else {
+								waitForSocketConnection(socket, callback);
+						}
+				}, 5); // wait 5 milisecond for the connection...
+}
+
+function writeToScreen(message)
+{
+		document.myform.outputtext.value += message
+		document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+
+}
+
+window.addEventListener("load", init, false);
+
+
+function sendText() {
+		doSend( document.myform.inputtext.value );
+}
+
+function clearText() {
+		document.myform.outputtext.value = "";
+}
+
+function doDisconnect() {
+		websocket.close();
+}
+
+function offLight() {
+		doSend("Lights:" + brideId + ":offLight");
+		document.getElementById("centerImage").src="sad.png";
+}
+
+function flashLight() {
+		doSend("Lights:" + brideId + ":flashLight");
+		document.getElementById("centerImage").src="fireworks.gif";
+}
+
+function resetLight() {
+		doSend("Lights:" + brideId + ":resetLight");
+		document.getElementById("centerImage").src="heart.png";
+}
+</script>
+<body onload="doConnect();">
+		<div  style="display: none;">
+		<div id="output"></div>
+
+		<form name="myform">
+				<p>
+				<textarea name="outputtext" rows="20" cols="50"></textarea>
+				</p>
+				<p>
+				<textarea name="inputtext" cols="50"></textarea>
+				</p>
+				<p>
+				<textarea name="url" cols="50"></textarea>
+				</p>
+				<p>
+				<input type="button" name=sendButton value="Send" onClick="sendText();">
+				<input type="button" name=clearButton value="Clear" onClick="clearText();">
+				<input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
+				<input type="button" name=connectButton value="Connect" onClick="doConnect();">
+				</p>
+		</form></div>
+				<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="row"  style="font-size: 60px; color: orange" align=center> 亚麻非诚勿扰<script> document.write(brideId);</script>号女嘉宾
+								<hr></div>
+						<div class="row"> <button type="button" class="btn-block btn btn-danger" style="font-size: 100px" onClick="offLight();">灭 灯</button></div><hr>
+						<div class="row"> <button type="button" class="btn-block btn btn-success" style="font-size: 100px" onClick="flashLight();">爆 灯</button></div><hr>
+						<div class="row"> <button type="button" class="btn-block btn btn-primary" style="font-size: 100px" onClick="resetLight();">亮 灯</button></div><hr>
+						<div class="row"> <img id="centerImage" width="100%" src="heart.png" /></div>
+				</div>
+				<hr>
+		</body>
+		</html> 
+
