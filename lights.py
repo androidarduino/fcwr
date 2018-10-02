@@ -107,6 +107,10 @@ def lightOn(obj, ws, l):
   print "light on called"
   l[obj] = "on"
   updateLEDs(obj, "off", "on")
+def iLike(obj, ws, l):
+  # 男嘉宾选择了心动女生
+  print "groom has chosen his favorite" + obj
+  ws.send("App:" + obj + ":favorite")
 
 def on_message(ws, message):
     # here update the light strings
@@ -136,6 +140,8 @@ def on_message(ws, message):
       favoriteGirl(obj, ws, l)
     if (verb == "lightOn"):
       lightOn(obj, ws, l)
+    if (verb == "iLike"):
+      iLike(obj, ws, l)
 
     print l
 
