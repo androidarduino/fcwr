@@ -11,7 +11,7 @@ import time
 l = {}
 #TODO: change default to False later, this is just for testing
 channel = True
-st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3"}
+st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3", "up":"5"}
 
 arduino = serial.Serial('/dev/cu.usbmodem1421', 9600, timeout = 1)
 
@@ -32,7 +32,13 @@ def updateLEDs(obj, oldStatus, newStatus):
     cmd = st[oldStatus] + "," + st[newStatus] + "," + obj + "\n"
     print "updating " + obj + " from " + oldStatus + " to " + newStatus + ":" + cmd
     arduino.write(cmd)
-    pass
+    for i in range(1,3):
+        m = arduino.readline()
+        print "Arduino returns: " + m
+        if ("200" in m):
+            return
+        time.sleep(0.1)
+    updateLEDs(obj, oldStatus, newStatus)
 
 def resetLight(obj, ws, l):
   #obj女嘉宾试图亮灯，一般不处理
@@ -68,7 +74,7 @@ def allLightsOn(obj, ws, l):
   setAir(True)
   for i in l:
     l[i] = "on"
-    updateLEDs(i, "off", "on")
+  updateLEDs("0", "off", "up")
 
 def allLightsFlash(obj, ws, l):
   # 庆祝模式，关闭通道，所有灯彩色闪烁状态
@@ -77,7 +83,7 @@ def allLightsFlash(obj, ws, l):
   for i in l:
     oldStatus = l[i]
     l[i] = "flash"
-    updateLEDs(i, oldStatus, "flash")
+  updateLEDs("0", oldStatus, "flash")
 
 def allLightsMusic(obj, ws, l):
   # 休闲模式，关闭通道，所有灯按照音乐节奏闪烁
@@ -92,7 +98,7 @@ def allLightsOff(obj, ws, l):
   for i in l:
     oldStatus = l[i]
     l[i] = "off"
-    updateLEDs(i, oldStatus, "off")
+  updateLEDs("0", oldStatus, "off")
 
 def favoriteGirl(obj, ws, l):
   # 心动女生为obj，确认通道开启后，obj灯开始闪烁，其他灯状态不变，关闭通道

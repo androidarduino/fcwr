@@ -7,8 +7,8 @@
 #define PIN 7
 
 // How many NeoPixels are attached to the Arduino?
-#define BRIDES 12
-#define NUMPIXELS 2
+#define BRIDES 3
+#define NUMPIXELS 25
 #define OFF 0
 #define ON 1
 #define FLASH 2
@@ -56,7 +56,15 @@ void loop() {
       int oldStatus = Serial.parseInt();
       int newStatus = Serial.parseInt();
       int object = Serial.parseInt() - 1;
+      Serial.println("200");
       if (Serial.read() == '\n') {
+        if (object > BRIDES) return;
+        if (object == -1) {
+          allLights(newStatus);
+          updateLEDs();
+          delay(20);
+          return;
+        }
         if (oldStatus == OFF && newStatus == ON) leds[object] = UP;
         if (oldStatus == ON && newStatus == FLASH) leds[object] = BURST;
         if (oldStatus != OFF && newStatus == ON) leds[object] = ON;
@@ -65,16 +73,17 @@ void loop() {
           for(int i=0;i<BRIDES;i++) leds[i]=OFF;
           leds[object] = FAVORITE;
         }
-        Serial.print("LED Status: ");
-        for(int i=0;i<BRIDES;i++) {
-          Serial.print(leds[i]);
-          Serial.print(" ");
-        }
-        Serial.println("");
       }
    }
    updateLEDs();
-   delay(50);
+   delay(20);
+}
+
+void allLights(int newStatus) {
+  for(int i=0;i<BRIDES;i++) {
+    leds[i] = newStatus;
+    c[i]=0;
+  }  
 }
 
 void updateLEDs() {
