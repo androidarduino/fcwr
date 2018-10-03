@@ -50,7 +50,7 @@ def flashLight(obj, ws, l):
   if (not (obj in l)):
     l[obj] = "on"
   status = l[obj]
-  if (status != "on" or not air()):
+  if ((status != "on" and status !="flash") or not air()):
     return
   ws.send("App:" + obj + ":flash")
   updateLEDs(obj, "on", "flash")
@@ -62,7 +62,7 @@ def offLight(obj, ws, l):
   if (not (obj in l)):
     l[obj] = "on"
   status = l[obj]
-  if (status != "on" or not air()):
+  if ((status != "on" and status !="off") or not air()):
     return
   ws.send("App:" + obj + ":off")
   updateLEDs(obj, "on", "off")

@@ -35,7 +35,6 @@ void setup() {
     c[i]=0;
     setAll(i,128,128,0);
   }
-  Serial.println("LEDS ready");
 }
 
 /*states: OFF, ON, FLASH, SETTING
