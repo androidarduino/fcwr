@@ -41,6 +41,7 @@ function onClose(evt)
 function onMessage(evt)
 {
 		writeToScreen("response: " + evt.data + '\n');
+        if (evt.data.indexOf("allLightsOn") != -1) resetLight(); 
 }
 
 function onError(evt)
