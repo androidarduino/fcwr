@@ -133,6 +133,11 @@ function flashLight() {
 				<input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
 				<input type="button" name=connectButton value="Connect" onClick="doConnect();">
 				</p>
+                <p>
+				<input type="button" name=allLightsOn value="全部亮灯" onClick="sendCmd('Lights:0:allLightsOn');">
+				<input type="button" name=successed value="牵手成功" onClick="sendCmd('Lights:0:allLightsFlash');">
+				<input type="button" name=favorite value="心动女生是……" onClick="sendCmd('Lights:0:favoriteGirl');">
+                </p>
 		</form></div>
 				<div class="col-md-4 col-sm-4 col-xs-4">
 						<button type="button" class="btn-block btn btn-danger" onClick="offLight();">灭 灯</button>

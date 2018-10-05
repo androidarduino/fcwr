@@ -15,6 +15,8 @@ st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3", "up":"5"}
 
 arduino = serial.Serial('/dev/cu.usbmodem1421', 9600, timeout = 1)
 
+favorite = 0
+
 # Initialize lights
 for i in range(1, 13):
     l[str(i)] = "off"
@@ -67,6 +69,11 @@ def offLight(obj, ws, l):
   ws.send("App:" + obj + ":off")
   updateLEDs(obj, "on", "off")
   l[obj] = "off"
+  # if all lights are out, declare failure
+  for i in l:
+    if l[i] != "off":
+        return
+  ws.send("App:" + obj + ":playFailed")
 
 def allLightsOn(obj, ws, l):
   # 所有灯为点亮状态，通道开启
@@ -75,6 +82,7 @@ def allLightsOn(obj, ws, l):
   for i in l:
     l[i] = "on"
   updateLEDs("0", "off", "up")
+  ws.send('App:' + obj + ":playStart")
 
 def allLightsFlash(obj, ws, l):
   # 庆祝模式，关闭通道，所有灯彩色闪烁状态
@@ -84,6 +92,7 @@ def allLightsFlash(obj, ws, l):
     oldStatus = l[i]
     l[i] = "flash"
   updateLEDs("0", oldStatus, "flash")
+  ws.send('App:' + obj + ":playSuccess")
 
 def allLightsMusic(obj, ws, l):
   # 休闲模式，关闭通道，所有灯按照音乐节奏闪烁
@@ -104,9 +113,12 @@ def favoriteGirl(obj, ws, l):
   # 心动女生为obj，确认通道开启后，obj灯开始闪烁，其他灯状态不变，关闭通道
   print "favorite girl called"
   setAir(False)
+  obj = favorite
   oldStatus = l[obj]
   l[obj] = "favorite"
   updateLEDs(obj, oldStatus, "favorite")
+  # App to play the sound effect for showing favorite girl
+  ws.send('App:' + obj + ":playShowFavorite")
 
 def lightOn(obj, ws, l):
   # 无论通道是否开启，都把obj的状态改为点亮，发送亮灯信息，不影响其他灯状态
@@ -117,6 +129,8 @@ def iLike(obj, ws, l):
   # 男嘉宾选择了心动女生
   print "groom has chosen his favorite" + obj
   ws.send("App:" + obj + ":favorite")
+  # Store favorite number
+  favorite = obj
 
 def on_message(ws, message):
     # here update the light strings
