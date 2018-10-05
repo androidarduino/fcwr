@@ -94,6 +94,10 @@ function sendText() {
 		doSend( document.myform.inputtext.value );
 }
 
+function sendCmd(cmd) {
+    doSend(cmd);
+}
+
 function clearText() {
 		document.myform.outputtext.value = "";
 }
