@@ -7,7 +7,7 @@
 #define PIN 7
 
 // How many NeoPixels are attached to the Arduino?
-#define BRIDES 3
+#define BRIDES 12
 #define NUMPIXELS 25
 #define OFF 0
 #define ON 1
@@ -110,6 +110,7 @@ void updateLEDs() {
       }
       if (c[i]>60000) c[i]-=60000;
   }
+  pixels.show();
 }
 
 void favorite(int counter, int base) {
@@ -136,7 +137,7 @@ bool waterFilling(int counter, int base) {
       pixels.setPixelColor(i, pixels.Color(255,50,50));
     else
       pixels.setPixelColor(i, pixels.Color(0,0,0));
-    pixels.show();    
+    //pixels.show();    
   }
   if (Counter % NUMPIXELS == NUMPIXELS - 1) {
     leds[base] = ON;
@@ -177,13 +178,14 @@ bool flash(int counter, int base) {
   if (counter == 0) {
     for(int i= base*NUMPIXELS;i<base*NUMPIXELS + NUMPIXELS;i++) {
       pixels.setPixelColor(i, pixels.Color(random(255),random(255),random(255)));
-      pixels.show();
+      //pixels.show();
     }
   }
   return false;
 }
 
 bool off(int, int base) {
+  
   setAll(base, 0,0,0);
   return true;
 }
@@ -191,7 +193,7 @@ bool off(int, int base) {
 void setAll(int base, int R, int G, int B) {
   for(int i=base*NUMPIXELS;i<base*NUMPIXELS+NUMPIXELS;i++){
     pixels.setPixelColor(i, pixels.Color(R,G,B));
-    pixels.show();
+    //pixels.show();
   }
 }
 

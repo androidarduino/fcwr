@@ -111,10 +111,13 @@ def allLightsOff(obj, ws, l):
 
 def favoriteGirl(obj, ws, l):
   # 心动女生为obj，确认通道开启后，obj灯开始闪烁，其他灯状态不变，关闭通道
+  global favorite
   print "favorite girl called"
+  if (favorite == 0):
+    return
   setAir(False)
-  obj = favorite
-  oldStatus = l[obj]
+  obj = str(favorite)
+  oldStatus = "on"
   l[obj] = "favorite"
   updateLEDs(obj, oldStatus, "favorite")
   # App to play the sound effect for showing favorite girl
@@ -127,6 +130,7 @@ def lightOn(obj, ws, l):
   updateLEDs(obj, "off", "on")
 def iLike(obj, ws, l):
   # 男嘉宾选择了心动女生
+  global favorite
   print "groom has chosen his favorite" + obj
   ws.send("App:" + obj + ":favorite")
   # Store favorite number
