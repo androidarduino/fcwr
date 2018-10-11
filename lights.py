@@ -13,7 +13,7 @@ l = {}
 channel = True
 st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3", "up":"5"}
 
-arduino = serial.Serial('/dev/cu.usbmodem1421', 9600, timeout = 1)
+arduino = serial.Serial('/dev/cu.usbmodem1421', 115200, timeout = 1)
 
 favorite = 0
 
@@ -77,6 +77,8 @@ def offLight(obj, ws, l):
 
 def allLightsOn(obj, ws, l):
   # 所有灯为点亮状态，通道开启
+  global favorite
+  favorite = 0
   print "all lights on called"
   setAir(True)
   for i in l:

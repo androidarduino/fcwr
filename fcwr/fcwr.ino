@@ -28,7 +28,7 @@ unsigned int c[BRIDES];
 int leds[BRIDES];
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   pixels.begin(); // This initializes the NeoPixel library.
   for (int i=0;i<BRIDES;i++) {
     leds[i]=OFF;
@@ -55,8 +55,8 @@ void loop() {
       int oldStatus = Serial.parseInt();
       int newStatus = Serial.parseInt();
       int object = Serial.parseInt() - 1;
-      Serial.println("200");
       if (Serial.read() == '\n') {
+        Serial.println("200");
         if (object > BRIDES) return;
         if (object == -1) {
           allLights(newStatus);
