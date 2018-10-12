@@ -13,7 +13,7 @@ l = {}
 channel = True
 st = {"on": "1", "off":"0", "flash":"2", "music":"4", "favorite":"3", "up":"5"}
 
-arduino = serial.Serial('/dev/cu.usbmodem1421', 115200, timeout = 1)
+arduino = serial.Serial('/dev/cu.usbmodem1421', 38400, timeout=0.01)
 
 favorite = 0
 
@@ -34,12 +34,14 @@ def updateLEDs(obj, oldStatus, newStatus):
     cmd = st[oldStatus] + "," + st[newStatus] + "," + obj + "\n"
     print "updating " + obj + " from " + oldStatus + " to " + newStatus + ":" + cmd
     arduino.write(cmd)
-    for i in range(1,3):
-        m = arduino.readline()
-        print "Arduino returns: " + m
-        if ("200" in m):
-            return
-        time.sleep(0.1)
+    time.sleep(0.1)
+    m = '\n'.join(arduino.readlines())
+    print "Arduino returns: " + m + "$"
+    if ("200" in m and "400" not in m):
+        return
+    print '\x1b[6;33;42m' + 'retrying.....' + '\x1b[0m'
+    time.sleep(0.1)
+    arduino.readlines()
     updateLEDs(obj, oldStatus, newStatus)
 
 def resetLight(obj, ws, l):
@@ -176,6 +178,8 @@ def on_error(ws, error):
 
 def on_close(ws):
     print("### closed ###")
+#    ws.connect("ws://ec2-34-201-43-105.compute-1.amazonaws.com:8000")
+    
 
 def on_open(ws):
     print "Connected to hub"

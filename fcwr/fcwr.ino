@@ -26,15 +26,20 @@ int delayval = 500; // delay for half a second
 int state = OFF;
 unsigned int c[BRIDES];
 int leds[BRIDES];
+String inputString = "";
+String reply;
+bool strComplete = false;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(38400);
   pixels.begin(); // This initializes the NeoPixel library.
   for (int i=0;i<BRIDES;i++) {
     leds[i]=OFF;
     c[i]=0;
     setAll(i,128,128,0);
   }
+  inputString.reserve(100);
+  reply.reserve(300);
 }
 
 /*states: OFF, ON, FLASH, SETTING
@@ -51,31 +56,62 @@ void loop() {
   //Receive command from serial port
   //update LED segments accordingly
   //call LED segments' processing unit with their counters
-   while (Serial.available() > 0) {
-      int oldStatus = Serial.parseInt();
-      int newStatus = Serial.parseInt();
-      int object = Serial.parseInt() - 1;
-      if (Serial.read() == '\n') {
-        Serial.println("200");
-        if (object > BRIDES) return;
-        if (object == -1) {
-          allLights(newStatus);
-          updateLEDs();
-          delay(20);
-          return;
-        }
-        if (oldStatus == OFF && newStatus == ON) leds[object] = UP;
-        if (oldStatus == ON && newStatus == FLASH) leds[object] = BURST;
-        if (oldStatus != OFF && newStatus == ON) leds[object] = ON;
-        if (newStatus == OFF) leds[object] = newStatus;
-        if (newStatus == FAVORITE) {
-          for(int i=0;i<BRIDES;i++) leds[i]=OFF;
-          leds[object] = FAVORITE;
-        }
-      }
-   }
-   updateLEDs();
-   delay(20);
+  updateLEDs();
+  delay(20);
+  if (strComplete) {
+    execute();
+    strComplete = false;
+    inputString = "";
+  }
+  if (reply != "") {
+    Serial.print(reply);
+    reply = "";
+  }
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag so the main loop can
+    // do something about it:
+    if (inChar == '\n') {
+      strComplete = true;
+    }
+  }
+}
+
+void execute() {
+  //compose reply
+  //extract oldStatus, newStatus, object from inputString
+  int pos1 = inputString.indexOf(',', 0);
+  int oldStatus = inputString.substring(0, pos1).toInt();
+  int pos2 = inputString.indexOf(',', pos1 + 1);
+  int newStatus = inputString.substring(pos1 + 1, pos2).toInt();
+  int object = inputString.substring(pos2 + 1).toInt() - 1;
+  if (pos2 == -1 || pos1 == pos2 - 1 || pos1 ==0 || pos2 == inputString.length() - 1) {
+      reply = reply + "400 "+ inputString +"\n";
+      return;
+  }
+  reply = reply + "200 " + inputString + "\n";
+  
+  if (object > BRIDES) return;
+  if (object == -1) {
+    allLights(newStatus);
+//    updateLEDs();
+//    delay(20);
+    return;
+  }
+  if (oldStatus == OFF && newStatus == ON) leds[object] = UP;
+  if (oldStatus == ON && newStatus == FLASH) leds[object] = BURST;
+  if (oldStatus != OFF && newStatus == ON) leds[object] = ON;
+  if (newStatus == OFF) leds[object] = newStatus;
+  if (newStatus == FAVORITE) {
+    for(int i=0;i<BRIDES;i++) leds[i]=OFF;
+    leds[object] = FAVORITE;
+  }
 }
 
 void allLights(int newStatus) {
