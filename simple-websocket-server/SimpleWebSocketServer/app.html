@@ -1,7 +1,7 @@
 <script language="javascript" type="text/javascript">
   function doConnect()
   {
-    websocket = new WebSocket("ws://ec2-34-201-43-105.compute-1.amazonaws.com:8000");
+    websocket = new WebSocket("ws://ec2-3-95-158-76.compute-1.amazonaws.com:8000");
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
